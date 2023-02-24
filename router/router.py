@@ -1,30 +1,33 @@
 # this is normal router file
+import typing
+from abc import abstractmethod
 
-class _AbstractRoute:
+
+class _AbstractRoute(typing.Protocol):
+    @abstractmethod
     def get(self, **handle_func):
-        pass
+        raise NotImplementedError
 
+    @abstractmethod
     def post(self):
-        pass
+        raise NotImplementedError
 
+    @abstractmethod
     def head(self):
-        pass
+        raise NotImplementedError
 
+    @abstractmethod
     def put(self):
-        pass
+        raise NotImplementedError
 
+    @abstractmethod
     def delete(self):
-        pass
+        raise NotImplementedError
 
+    @abstractmethod
     def any(self):
-        pass
+        raise NotImplementedError
 
+    @abstractmethod
     def options(self):
-        pass
-
-
-class RouterInfo:
-    def __init__(self):
-        self._is_root = True
-        self._base_path = "/"
-        pass
+        raise NotImplementedError

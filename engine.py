@@ -3,13 +3,13 @@ import typing
 import context
 from werkzeug.urls import url_parse
 from werkzeug.wrappers import Request, Response
-
-test_func = lambda c: c.json({"name": "wochao", "age": 18, "gender": 1})
+from router import router, trie
 
 
 class Engine:
     def __init__(self):
         self._method_trees = []  # router
+        self._router = trie.TrieRouterImpl()  # using a trie router
 
     def dispatch_request(self, c: context.Context):
         print(c.request.path)
@@ -29,8 +29,7 @@ class Engine:
         resp = Response()
         c = context.Context(request, resp)  # should put into pool later to reduce memory/cpu consumption
         try:
-            test_func(c)
-            # self.dispatch_request(c)
+            self.dispatch_request(c)
         except Exception as e:
             print("error: ", e)
         return c.response(environ, start_response)
@@ -53,7 +52,12 @@ class Engine:
         run_simple(addr, port, self, use_debugger=True, use_reloader=False)
 
 
+def test_post(c: context.Context):
+    c.text("wocao")
+
+
 if __name__ == "__main__":
     r = Engine()
-    r.add_route("/ping", lambda c: print(c), "GET")  # add a get route
+    r.add_route("/ping", lambda c: print(c), "GET") \
+        .add_route("/user/:id", test_post, "POST")  # add a get route
     r.run_server()
