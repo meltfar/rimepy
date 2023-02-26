@@ -31,3 +31,7 @@ class _AbstractRoute(typing.Protocol):
     @abstractmethod
     def options(self):
         raise NotImplementedError
+
+    @abstractmethod
+    def add_route(self, path, cb, method):
+        raise NotImplementedError

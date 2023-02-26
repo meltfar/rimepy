@@ -8,20 +8,22 @@ from router import router, trie
 
 class Engine:
     def __init__(self):
-        self._method_trees = []  # router
         self._router = trie.TrieRouterImpl()  # using a trie router
 
     def dispatch_request(self, c: context.Context):
-        print(c.request.path)
-        for pat in self._method_trees:
-            print(pat)
         # TODO: router part, select registered handler by router path
         # c.response.set_data(value=c.request.path)
-        d = dict()
-        d["name"] = "wocao"
-        d["age"] = 18
-        d["gender"] = 1
-        c.json(d)
+        cb = self._router.match_request(c.request)
+        if cb is not None:
+            try:
+                cb(c)
+            except Exception as e:
+                print(e)
+        else:
+            # TODO: custom error handler for user
+            c.response.status_code = 404
+            c.response.set_data("sorry, destination not found")
+
         print(c.response.status)
 
     def wsgi_app(self, environ, start_response):
@@ -38,7 +40,7 @@ class Engine:
         return self.wsgi_app(environ, start_response)
 
     def add_route(self, path: str, cb: typing.Callable[[context.Context], None], method: str = "GET"):
-        pass
+        self._router.add_route(path, cb, method)
         return self
 
     def add_route_callback(self, path: str, cb: typing.Callable[[context.Context], None], method: str = "GET"):
@@ -58,6 +60,7 @@ def test_post(c: context.Context):
 
 if __name__ == "__main__":
     r = Engine()
-    r.add_route("/ping", lambda c: print(c), "GET") \
-        .add_route("/user/:id", test_post, "POST")  # add a get route
+    r.add_route("/ping/del", lambda c: print(c), "GET") \
+        .add_route("/ping/get", test_post, "GET")  # add a get route
+
     r.run_server()
