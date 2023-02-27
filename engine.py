@@ -19,12 +19,12 @@ class Engine:
                 cb(c)
             except Exception as e:
                 print(e)
+                c.response.status_code = 500
+                c.response.set_data(str(e))
         else:
             # TODO: custom error handler for user
             c.response.status_code = 404
             c.response.set_data("sorry, destination not found")
-
-        print(c.response.status)
 
     def wsgi_app(self, environ, start_response):
         request = Request(environ)
