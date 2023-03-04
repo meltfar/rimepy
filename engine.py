@@ -1,9 +1,8 @@
 import typing
 
 import context
-from werkzeug.urls import url_parse
 from werkzeug.wrappers import Request, Response
-from router import router, trie
+from router import trie
 
 
 class Engine:
@@ -11,7 +10,6 @@ class Engine:
         self._router = trie.TrieRouterImpl()  # using a trie router
 
     def dispatch_request(self, c: context.Context):
-        # TODO: router part, select registered handler by router path
         # c.response.set_data(value=c.request.path)
         cb = self._router.match_request(c.request)
         if cb is not None:
@@ -43,10 +41,6 @@ class Engine:
         self._router.add_route(path, cb, method)
         return self
 
-    def add_route_callback(self, path: str, cb: typing.Callable[[context.Context], None], method: str = "GET"):
-        pass
-        return self
-
     def run_server(self, addr: str = "0.0.0.0", port: int = 8080):
         from werkzeug.serving import run_simple
         print("server starting...")
@@ -58,9 +52,18 @@ def test_post(c: context.Context):
     c.text("wocao")
 
 
+def test_par(c: context.Context):
+    n = c.get_parameter("name")
+    if n is not None:
+        print("we got a", n)
+        print(n)
+    c.text("okok")
+
+
 if __name__ == "__main__":
     r = Engine()
     r.add_route("/ping/del", lambda c: print(c), "GET") \
-        .add_route("/ping/get", test_post, "GET")  # add a get route
+        .add_route("/ping/get", test_post, "GET") \
+        .add_route("/user/name", test_par, "GET")
 
     r.run_server()

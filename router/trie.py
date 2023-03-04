@@ -154,7 +154,7 @@ class TreeNode:
             if c_matched is not None:
                 return c_matched
 
-            # TODO: test for not using recurrition ?
+            # TODO: test for not using recursion ?
             # while len(c.children) > 0:
             #     desired_child = None
             #     for cc in c.children:
